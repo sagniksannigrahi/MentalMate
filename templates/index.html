@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MentalMate</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>MentalMate 🧠💙</h1>
+
+    <form method="POST">
+        <textarea name="journal" placeholder="How was your day?" required></textarea>
+        <br>
+
+        <button type="button" id="mic-btn">
+            🎤 <span id="mic-status">Click to Speak</span>
+        </button>
+        <br><br>
+
+        <button type="submit">Analyze Mood</button>
+    </form>
+
+    {% if mood_score is not none %}
+        <h2>Your Mood Score: {{ mood_score }}</h2>
+        <p>{{ quote }}</p>
+
+        <h3>📊 Your Mood Graph</h3>
+        <img src="{{ url_for('static', filename='mood_graph.png') }}?v={{ mood_score }}" 
+        alt="Mood Graph" style="max-width: 90%; border-radius: 10px; box-shadow: 0 0 12px #ccc;">
+    {% endif %}
+
+    <script>
+        const micBtn = document.getElementById("mic-btn");
+        const micStatus = document.getElementById("mic-status");
+        const journalInput = document.querySelector("textarea");
+
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = "en-US";
+
+            micBtn.addEventListener("click", () => {
+                recognition.start();
+                micBtn.classList.add("listening");
+                micStatus.innerText = "Listening...";
+            });
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                journalInput.value = transcript;
+                micStatus.innerText = "Click to Speak";
+                micBtn.classList.remove("listening");
+            };
+
+            recognition.onerror = function(event) {
+                console.error(event.error);
+                micStatus.innerText = "Click to Speak";
+                micBtn.classList.remove("listening

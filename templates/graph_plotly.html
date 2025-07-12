@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MentalMate – Mood Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f9f9;
+            margin: 20px;
+        }
+        #graph {
+            width: 90%;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Your Interactive Mood Dashboard</h1>
+    <p>Hover over the line to see your daily mood insights</p>
+
+    <div id="graph"></div>
+
+    <br>
+    <a href="/">← Back to Home</a>
+
+<script>
+    try {
+        const dataFromServer = JSON.parse('{{ data | safe }}');
+        console.log("✅ Data received:", dataFromServer);
+
+        const trace = {
+            x: dataFromServer.dates,
+            y: dataFromServer.scores,
+            text: dataFromServer.emojis,
+            mode: 'lines+markers+text',
+            type: 'scatter',
+            marker: { color: 'blue', size: 8 },
+            textposition: 'top center',
+            line: { shape: 'spline', width: 3 }
+        };
+
+        const layout = {
+            title: 'Mood Over Time',
+            xaxis: { title: 'Date' },
+            yaxis: {
+                title: 'Mood Score',
+                range: [-1.05, 1.05],
+                tickvals: [-1, -0.5, 0, 0.5, 1],
+                ticktext: ['😭', '😟', '😐', '🙂', '😄']
+            },
+            plot_bgcolor: '#ffffff',
+            paper_bgcolor: '#ffffff'
+        };
+
+        Plotly.newPlot('graph', [trace], layout, {responsive: true});
+    } catch (e) {
+        console.error("❌ Error loading data:", e);
+    }
+</script>
+</body>
+</html>
